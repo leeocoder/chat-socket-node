@@ -71,10 +71,10 @@ socket.on('user-disconnected', (data) => {
 });
 
 messageInput.addEventListener('keyup', (e) => {
-  if (e.key === 'Enter') {
+  if (e.key.toUpperCase() === 'Enter'.toUpperCase()) {
     const message = e.target.value.trim();
     if (message.length > 0) {
-      socket.emit('message', { userName, message });
+      socket.emit('message', { message });
       e.target.value = '';
     }
   }
@@ -101,3 +101,22 @@ const addMessage = (type, user, message) => {
   chatList.appendChild(li);
   chatList.scrollTop = chatList.scrollHeight;
 };
+
+socket.on('message', (data) => {
+  addMessage('message', data.userName, data.message);
+});
+
+socket.on('reconnect_error', () => {
+  addMessage('status', null, 'tentando reconectar...');
+});
+
+socket.on('disconnect', () => {
+  addMessage('status', null, 'você foi desconectado do servidor');
+});
+
+socket.on('reconnect', () => {
+  addMessage('status', null, 'reconectado ao servidor');
+  if (userName.length > 0) {
+    socket.emit('join-request', { userName });
+  }
+});

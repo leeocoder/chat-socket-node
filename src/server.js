@@ -17,9 +17,6 @@ server.listen(3000, () => {
 const connectedUsers = [];
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
-  console.log(socket.id);
-
   socket.on('join-request', (data) => {
     connectedUsers.push(data.userName);
     socket.userName = data.userName;
@@ -32,9 +29,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('A user disconnected');
-    console.log(socket.userName);
-
     if (socket.userName) {
       const index = connectedUsers.indexOf(socket.userName);
       if (index !== -1) {
@@ -46,5 +40,17 @@ io.on('connection', (socket) => {
         list: connectedUsers,
       });
     }
+  });
+
+  socket.on('message', (data) => {
+    socket.broadcast.emit('message', {
+      userName: socket.userName,
+      message: data.message,
+    });
+
+    socket.emit('message', {
+      userName: socket.userName,
+      message: data.message,
+    });
   });
 });
