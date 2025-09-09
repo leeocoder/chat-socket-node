@@ -20,7 +20,7 @@
       <h1>Qual seu nome?</h1>
       <input
         type="text"
-        id="name"
+        id="userNameInput"
       />
     </div>
 
@@ -29,14 +29,7 @@
       id="chatPage"
     >
       <div class="chatArea">
-        <ul class="chatList">
-          <li class="m-status">Fulano saiu da sala</li>
-          <li>Mensagem 2</li>
-          <li class="m-message"><span>Benjamin: </span>Mensagem 3</li>
-          <li class="m-message">
-            <span class="mine">Leonardo: </span>Mensagem 3
-          </li>
-        </ul>
+        <ul class="chatList"></ul>
         <ul class="userList">
           <li>Usuário 1 (você)</li>
           <li>Usuário 2</li>
@@ -47,11 +40,14 @@
       <div class="chatInput">
         <input
           type="text"
-          name="message"
-          id="message"
+          name="messageInput"
+          id="messageInput"
           placeholder='Digite sua mensagem e aperte "Enter"'
         />
       </div>
     </div>
+
+    <script src="./socket.io/socket.io.js"></script>
+    <script src="main.js"></script>
   </body>
 </html>
