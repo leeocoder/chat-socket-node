@@ -10,42 +10,50 @@
       rel="stylesheet"
       href="style.css"
     />
-    <title>Chat Node</title>
+    <title>Chat em Tempo Real</title>
   </head>
   <body>
-    <div
-      class="page"
+    <!-- Tela de login -->
+    <section
+      class="page page--login"
       id="loginPage"
     >
       <h1>Qual seu nome?</h1>
       <input
         type="text"
         id="userNameInput"
+        placeholder="Digite seu nome e pressione Enter"
       />
-    </div>
+    </section>
 
-    <div
-      class="page"
+    <!-- Tela de chat -->
+    <section
+      class="page page--chat"
       id="chatPage"
     >
       <div class="chatArea">
-        <ul class="chatList"></ul>
-        <ul class="userList">
-          <li>Usuário 1 (você)</li>
-          <li>Usuário 2</li>
-          <li>Usuário 3</li>
-        </ul>
-        <div></div>
+        <!-- Área principal das mensagens -->
+        <ul
+          class="chatMessages"
+          id="chatMessages"
+        ></ul>
+
+        <!-- Lista de usuários conectados -->
+        <aside class="chatUsers">
+          <h2>Usuários</h2>
+          <ul id="userList"></ul>
+        </aside>
       </div>
-      <div class="chatInput">
+
+      <!-- Campo de entrada da mensagem -->
+      <footer class="chatInput">
         <input
           type="text"
-          name="messageInput"
           id="messageInput"
           placeholder='Digite sua mensagem e aperte "Enter"'
         />
-      </div>
-    </div>
+      </footer>
+    </section>
 
     <script src="./socket.io/socket.io.js"></script>
     <script src="main.js"></script>

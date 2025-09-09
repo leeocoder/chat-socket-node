@@ -1,20 +1,27 @@
 {
   "name": "chat-socket-node",
   "version": "1.0.0",
-  "description": "",
+  "description": "Aplicação de chat em tempo real utilizando Node.js, Express e Socket.io",
   "main": "src/server.js",
+  "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ."
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"No test specified\" && exit 0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/leeocoder/chat-socket-node.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "chat",
+    "nodejs",
+    "socket.io",
+    "express",
+    "realtime"
+  ],
+  "author": "Leonardo Albuquerque",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/leeocoder/chat-socket-node/issues"
   },

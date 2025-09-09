@@ -1,13 +1,50 @@
+/* style.css - moderna, responsiva e compatível com o JS existente */
+
+/* ---------------------------
+   Tema e resets
+   --------------------------- */
+:root {
+  --bg-1: linear-gradient(180deg, #0f172a 0%, #071029 100%);
+  --surface: #0f172a;
+  --card: #0b1220;
+  --muted: #9aa4b2;
+  --accent: #2563eb; /* azul */
+  --accent-2: #06b6d4;
+  --glass: rgba(255, 255, 255, 0.04);
+  --radius: 12px;
+  --max-width: 1100px;
+  --gap: 16px;
+  --text: #e6eef8;
+  --status: #9aa4b2;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial;
+}
+
 * {
-  padding: 0;
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  min-height: 100vh;
+  background: var(--bg-1);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-ul {
-  list-style: none;
-}
-
+/* ---------------------------
+   Páginas (login / chat)
+   --------------------------- */
 .page {
   width: 100vw;
   height: 100vh;
@@ -15,79 +52,256 @@ ul {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  padding: 24px;
 }
 
+/* Login: centralizado card */
 #loginPage {
-  display: flex;
-  background-color: #f0f0f0;
+  display: flex; /* o JS controla visibilidade no runtime */
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(0, 0, 0, 0.02)
+  );
 }
 
-#loginPage input {
-  padding: 10px;
-  font-size: 16px;
-  margin-top: 10px;
+#loginPage > h1 {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 20px;
+  color: var(--text);
 }
 
+#userNameInput {
+  width: 320px;
+  max-width: 90vw;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  outline: none;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+#userNameInput:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.12);
+}
+
+/* Chat: escondida por padrão (JS também controla) */
 #chatPage {
   display: none;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
 }
 
-.chatList {
-  flex: 1;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: scroll;
-  max-height: calc(100vh - 40px);
-}
-
-.chatList li.m-status {
-  color: #888;
-  font-style: italic;
-}
-
-.chatList li.m-message span {
-  font-weight: bold;
-}
-
-.chatList li.m-message span {
-  font-weight: bold;
-}
-
-.chatList li.m-message span.mine {
-  color: blue;
-}
-
-.userList {
-  width: 200px;
-  background: #eee;
-  padding: 32px;
-  overflow-y: scroll;
-  max-height: calc(100vh - 40px);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
+/* ---------------------------
+   Container do chat (card)
+   --------------------------- */
 .chatArea {
-  flex: 1;
-  width: 100%;
+  margin: 0 auto;
+  width: min(var(--max-width), 96%);
+  height: calc(100vh - 120px);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(0, 0, 0, 0.02)
+  );
+  border-radius: var(--radius);
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: var(--gap);
+  box-shadow: 0 20px 60px rgba(2, 6, 23, 0.6);
+  align-items: start;
+  overflow: hidden;
+}
+
+/* ---------------------------
+   Mensagens
+   --------------------------- */
+#chatMessages {
   display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  overflow-y: auto;
+  max-height: 100%;
+  align-items: flex-start;
 }
 
+/* cada li */
+#chatMessages li {
+  list-style: none;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+/* status (sistema) */
+#chatMessages li.message--status {
+  align-self: center;
+  font-size: 13px;
+  color: var(--status);
+  font-style: italic;
+  background: transparent;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+/* bolha de texto */
+#chatMessages li.message--text {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.3;
+  box-shadow: 0 4px 18px rgba(2, 6, 23, 0.45);
+}
+
+/* nome do usuário em negrito */
+#chatMessages li.message--text > span {
+  font-weight: 700;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+/* destaque do seu nome dentro da bolha */
+#chatMessages li.message--text > span.mine {
+  color: #fff;
+}
+
+/* --- modern alignment: se o li contém span.mine, alinhar a bolha à direita e inverter cores
+      Nota: usa :has() (Suporte moderno). Há fallback logo abaixo. --- */
+#chatMessages li.message--text:has(> span.mine) {
+  align-self: flex-end;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  color: #fff;
+}
+
+/* Fallback confortável para navegadores sem :has(): aplica destaque ao span.mine,
+   mas a bolha continuará à esquerda. */
+@supports not (selector(:has(*))) {
+  /* já existe destaque para o nome com .mine; também alteramos borda para visibilidade */
+  #chatMessages li.message--text > span.mine {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+}
+
+/* ---------------------------
+   Lista de usuários
+   --------------------------- */
+.chatUsers {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.01),
+    rgba(255, 255, 255, 0.02)
+  );
+  border-radius: 10px;
+  padding: 14px;
+  height: 100%;
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.chatUsers h2 {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+
+/* id usado pelo JS (#userList) */
+#userList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+#userList li {
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.01);
+}
+
+/* ---------------------------
+   Campo de input (rodapé)
+   --------------------------- */
 .chatInput {
-  width: 100%;
+  width: min(var(--max-width), 96%);
+  margin: 12px auto 0 auto;
+  position: sticky;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
 }
 
-.chatInput input {
-  flex: 1;
-  height: 40px;
-  font-size: 16px;
-  padding: 0 10px;
-  font-size: 16px;
-  background-color: #f2f2f2;
-  outline: none;
+#messageInput {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
   border: none;
-  min-width: 100%;
+  outline: none;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.55);
+}
+
+#messageInput::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+#chatMessages::-webkit-scrollbar,
+.chatUsers::-webkit-scrollbar {
+  width: 10px;
+}
+#chatMessages::-webkit-scrollbar-thumb,
+.chatUsers::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+}
+
+/* ---------------------------
+   Responsividade
+   --------------------------- */
+@media (max-width: 900px) {
+  .chatArea {
+    grid-template-columns: 1fr 200px;
+  }
+  #chatMessages li.message--text {
+    max-width: 72%;
+  }
+}
+
+@media (max-width: 700px) {
+  .chatArea {
+    grid-template-columns: 1fr;
+    height: calc(100vh - 150px);
+    padding: 12px;
+  }
+  .chatUsers {
+    display: none;
+  } /* esconder a lista de usuários em mobile para priorizar mensagens */
+  #chatMessages {
+    padding: 12px 6px;
+  }
+  #chatMessages li.message--text {
+    max-width: 94%;
+  }
+  .chatInput {
+    width: 94%;
+  }
 }

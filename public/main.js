@@ -1,122 +1,249 @@
+// -------------------- variáveis --------------------
 const socket = io();
-let userName = '';
-let userList = [];
+let currentUserName = '';
+let connectedUsers = [];
 
-let loginPage = document.getElementById('loginPage');
-let chatPage = document.getElementById('chatPage');
+// -------------------- elementos (com fallback) --------------------
+const loginPage = document.getElementById('loginPage');
+const chatPage = document.getElementById('chatPage');
 
-let userNameInput = document.getElementById('userNameInput');
-let messageInput = document.getElementById('messageInput');
+const userNameInput = document.getElementById('userNameInput');
+const messageInput = document.getElementById('messageInput');
 
-const showChatPage = () => {
-  loginPage.style.display = 'none';
-  chatPage.style.display = 'flex';
-};
+function createAndAttachUserListFallback() {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'chatUsers-fallback';
+  const title = document.createElement('h2');
+  title.innerText = 'Usuários';
+  const ul = document.createElement('ul');
+  ul.id = 'userList';
+  wrapper.appendChild(title);
+  wrapper.appendChild(ul);
 
-const showLoginPage = () => {
-  loginPage.style.display = 'flex';
-  chatPage.style.display = 'none';
-};
+  // tenta anexar no container .chatArea se existir, senão no próprio chatPage
+  const chatArea = chatPage.querySelector('.chatArea') || chatPage;
+  chatArea.appendChild(wrapper);
 
-showLoginPage();
+  console.warn(
+    '[main.js] userList não encontrado no DOM — criei fallback #userList'
+  );
+  return ul;
+}
 
-userNameInput.addEventListener('keyup', (e) => {
-  if (e.key.toLocaleUpperCase() === 'Enter'.toLocaleUpperCase()) {
-    const name = e.target.value.trim();
-    if (name.length > 0) {
-      userName = name;
-      document.title = `Chat - ${userName}`;
-      socket.emit('join-request', { userName });
-    }
-  }
-});
+// procura por id primeiro, depois por classe, depois cria fallback
+const userListElement =
+  document.getElementById('userList') ||
+  document.querySelector('.userList') ||
+  createAndAttachUserListFallback();
 
-socket.on('joined', (data) => {
-  userList = data.connectedUsers;
-  messageInput.focus();
-  showChatPage();
-  updateUserList();
+const chatMessagesElement =
+  document.getElementById('chatMessages') ||
+  document.querySelector('.chatList');
 
-  if (data.userName === userName) {
-    addMessage('status', null, 'você entrou no chat');
-  }
-});
+// -------------------- utilitários --------------------
+function isEnterKey(event) {
+  return event.key && event.key.toUpperCase() === 'ENTER';
+}
 
-const updateUserList = () => {
-  let ul = chatPage.querySelector('.userList');
-  ul.innerHTML = '';
+function safeText(text) {
+  // evita injeção simples (não é sanitização completa do servidor)
+  const div = document.createElement('div');
+  div.innerText = text;
+  return div.innerHTML;
+}
 
-  userList.forEach((u) => {
-    let li = document.createElement('li');
-    li.textContent = u;
-    ul.appendChild(li);
+// -------------------- UI (mostrar/esconder) --------------------
+function hideElement(element) {
+  if (!element) return;
+  element.style.display = 'none';
+}
+function showElement(element, displayType = 'flex') {
+  if (!element) return;
+  element.style.display = displayType;
+}
+function showLoginPage() {
+  showElement(loginPage, 'flex');
+  hideElement(chatPage);
+}
+function showChatPage() {
+  hideElement(loginPage);
+  showElement(chatPage, 'flex');
+}
+
+// -------------------- render users --------------------
+function clearUserList() {
+  if (!userListElement) return;
+  userListElement.innerHTML = '';
+}
+
+function createUserListItem(user) {
+  const li = document.createElement('li');
+  li.innerText = user;
+  return li;
+}
+
+function renderUserList() {
+  if (!userListElement) return;
+  clearUserList();
+  connectedUsers.forEach((user) => {
+    userListElement.appendChild(createUserListItem(user));
   });
-};
+}
 
-socket.on('user-connected', (data) => {
-  userList = data.list;
-  updateUserList();
+// -------------------- mensagens --------------------
+function appendMessageElement(li) {
+  if (!chatMessagesElement) return;
+  chatMessagesElement.appendChild(li);
+  chatMessagesElement.scrollTop = chatMessagesElement.scrollHeight;
+}
 
-  if (data.joined === userName) {
-    addMessage('status', null, 'entrou no chat');
+function createStatusMessageElement(message) {
+  const li = document.createElement('li');
+  li.classList.add('message--status');
+  li.innerText = message;
+  return li;
+}
+
+function createTextMessageElement(user, message) {
+  const li = document.createElement('li');
+  li.classList.add('message--text');
+
+  const userSpan = document.createElement('span');
+  userSpan.innerText = `${user}: `;
+  if (user === currentUserName) {
+    userSpan.classList.add('mine');
+    li.classList.add('message--mine');
+  }
+
+  li.appendChild(userSpan);
+
+  // usa safeText para evitar que HTML vindo do servidor quebre a UI
+  const txt = document.createElement('span');
+  txt.innerHTML = safeText(message);
+  li.appendChild(txt);
+
+  return li;
+}
+
+function addStatusMessage(message) {
+  appendMessageElement(createStatusMessageElement(message));
+}
+function addTextMessage(user, message) {
+  appendMessageElement(createTextMessageElement(user, message));
+}
+
+// -------------------- login & envio --------------------
+function setCurrentUserName(name) {
+  currentUserName = name;
+  document.title = `Chat - ${currentUserName}`;
+}
+function requestJoinChat(name) {
+  console.log('[main.js] emit join-request', name);
+  socket.emit('join-request', { userName: name });
+}
+function handleLoginInput(event) {
+  if (!isEnterKey(event)) return;
+  const name = event.target.value.trim();
+  if (name.length === 0) return;
+  setCurrentUserName(name);
+  requestJoinChat(name);
+}
+
+function clearMessageInput() {
+  if (!messageInput) return;
+  messageInput.value = '';
+}
+function requestSendMessage(message) {
+  socket.emit('message', { message });
+}
+function handleMessageInput(event) {
+  if (!isEnterKey(event)) return;
+  const message = event.target.value.trim();
+  if (message.length === 0) return;
+  requestSendMessage(message);
+  clearMessageInput();
+}
+
+// -------------------- socket handlers --------------------
+function handleJoinedEvent(data) {
+  console.log('[main.js] event joined', data);
+  // Se o servidor enviar a lista no joined, usamos como fallback
+  if (Array.isArray(data.connectedUsers) && data.connectedUsers.length > 0) {
+    connectedUsers = data.connectedUsers;
+    renderUserList();
+  }
+  showChatPage();
+  if (messageInput) messageInput.focus();
+
+  if (data.userName === currentUserName) {
+    addStatusMessage('Você entrou no chat');
+  }
+}
+
+function handleUserConnectedEvent(data) {
+  console.log('[main.js] event user-connected', data);
+  if (data.joined !== currentUserName) {
+    addStatusMessage(`${data.joined} entrou no chat`);
   } else {
-    addMessage('status', data.joined, `${data.joined} entrou no chat`);
+    // caso o server use joined para comunicar o próprio cliente
+    addStatusMessage('Você entrou no chat');
   }
-});
+}
 
-socket.on('user-disconnected', (data) => {
-  userList = data.list;
-  updateUserList();
-  addMessage('status', userName, `${data.left} saiu do chat`);
-});
+function handleUserDisconnectedEvent(data) {
+  console.log('[main.js] event user-disconnected', data);
+  addStatusMessage(`${data.left} saiu do chat`);
+}
 
-messageInput.addEventListener('keyup', (e) => {
-  if (e.key.toUpperCase() === 'Enter'.toUpperCase()) {
-    const message = e.target.value.trim();
-    if (message.length > 0) {
-      socket.emit('message', { message });
-      e.target.value = '';
-    }
+function handleUserListUpdateEvent(data) {
+  console.log('[main.js] event update-user-list', data);
+  if (Array.isArray(data.users)) {
+    connectedUsers = data.users;
+    renderUserList();
+  } else {
+    console.warn('[main.js] update-user-list recebeu payload inesperado', data);
   }
-});
+}
 
-// Function to add messages to the chat area
-const addMessage = (type, user, message) => {
-  const chatList = chatPage.querySelector('.chatList');
-  let li = document.createElement('li');
+function handleMessageEvent(data) {
+  addTextMessage(data.userName, data.message);
+}
 
-  if (type === 'status') {
-    li.classList.add('m-status');
-    li.innerText = message;
-  } else if (type === 'message') {
-    li.classList.add('m-message');
-    let span = document.createElement('span');
-    span.innerText = `${user}: `;
-    if (user === userName) {
-      span.classList.add('mine');
-    }
-    li.appendChild(span);
-    li.innerHTML += message;
+function handleReconnectErrorEvent() {
+  addStatusMessage('Tentando reconectar...');
+}
+function handleDisconnectEvent() {
+  addStatusMessage('Você foi desconectado do servidor');
+}
+function handleReconnectEvent() {
+  addStatusMessage('Reconectado ao servidor');
+  if (currentUserName.length > 0) {
+    requestJoinChat(currentUserName);
   }
-  chatList.appendChild(li);
-  chatList.scrollTop = chatList.scrollHeight;
-};
+}
 
-socket.on('message', (data) => {
-  addMessage('message', data.userName, data.message);
-});
+// -------------------- registro de eventos --------------------
+function registerUIEvents() {
+  if (userNameInput) userNameInput.addEventListener('keyup', handleLoginInput);
+  if (messageInput) messageInput.addEventListener('keyup', handleMessageInput);
+}
 
-socket.on('reconnect_error', () => {
-  addMessage('status', null, 'tentando reconectar...');
-});
+function registerSocketEvents() {
+  socket.on('joined', handleJoinedEvent);
+  socket.on('user-connected', handleUserConnectedEvent);
+  socket.on('user-disconnected', handleUserDisconnectedEvent);
+  socket.on('update-user-list', handleUserListUpdateEvent);
+  socket.on('message', handleMessageEvent);
+  socket.on('reconnect_error', handleReconnectErrorEvent);
+  socket.on('disconnect', handleDisconnectEvent);
+  socket.on('reconnect', handleReconnectEvent);
+}
 
-socket.on('disconnect', () => {
-  addMessage('status', null, 'você foi desconectado do servidor');
-});
-
-socket.on('reconnect', () => {
-  addMessage('status', null, 'reconectado ao servidor');
-  if (userName.length > 0) {
-    socket.emit('join-request', { userName });
-  }
-});
+// -------------------- init --------------------
+function init() {
+  showLoginPage();
+  registerUIEvents();
+  registerSocketEvents();
+  console.log('[main.js] client inicializado');
+}
+init();
