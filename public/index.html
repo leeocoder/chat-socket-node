@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <link
+      rel="stylesheet"
+      href="style.css"
+    />
+    <title>Chat Node</title>
+  </head>
+  <body>
+    <div
+      class="page"
+      id="loginPage"
+    >
+      <h1>Qual seu nome?</h1>
+      <input
+        type="text"
+        id="name"
+      />
+    </div>
+
+    <div
+      class="page"
+      id="chatPage"
+    >
+      <div class="chatArea">
+        <ul class="chatList">
+          <li class="m-status">Fulano saiu da sala</li>
+          <li>Mensagem 2</li>
+          <li class="m-message"><span>Benjamin: </span>Mensagem 3</li>
+          <li class="m-message">
+            <span class="mine">Leonardo: </span>Mensagem 3
+          </li>
+        </ul>
+        <ul class="userList">
+          <li>Usuário 1 (você)</li>
+          <li>Usuário 2</li>
+          <li>Usuário 3</li>
+        </ul>
+        <div></div>
+      </div>
+      <div class="chatInput">
+        <input
+          type="text"
+          name="message"
+          id="message"
+          placeholder='Digite sua mensagem e aperte "Enter"'
+        />
+      </div>
+    </div>
+  </body>
+</html>

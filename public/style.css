@@ -1,0 +1,93 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+ul {
+  list-style: none;
+}
+
+.page {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#loginPage {
+  display: flex;
+  background-color: #f0f0f0;
+}
+
+#loginPage input {
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+#chatPage {
+  display: none;
+}
+
+.chatList {
+  flex: 1;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: scroll;
+  max-height: calc(100vh - 40px);
+}
+
+.chatList li.m-status {
+  color: #888;
+  font-style: italic;
+}
+
+.chatList li.m-message span {
+  font-weight: bold;
+}
+
+.chatList li.m-message span {
+  font-weight: bold;
+}
+
+.chatList li.m-message span.mine {
+  color: blue;
+}
+
+.userList {
+  width: 200px;
+  background: #eee;
+  padding: 32px;
+  overflow-y: scroll;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chatArea {
+  flex: 1;
+  width: 100%;
+  display: flex;
+}
+
+.chatInput {
+  width: 100%;
+}
+
+.chatInput input {
+  flex: 1;
+  height: 40px;
+  font-size: 16px;
+  padding: 0 10px;
+  font-size: 16px;
+  background-color: #f2f2f2;
+  outline: none;
+  border: none;
+  min-width: 100%;
+}

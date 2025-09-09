@@ -2,9 +2,10 @@
   "name": "chat-socket-node",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ."
   },
   "repository": {
     "type": "git",
@@ -17,5 +18,11 @@
   "bugs": {
     "url": "https://github.com/leeocoder/chat-socket-node/issues"
   },
-  "homepage": "https://github.com/leeocoder/chat-socket-node#readme"
+  "homepage": "https://github.com/leeocoder/chat-socket-node#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
 }
